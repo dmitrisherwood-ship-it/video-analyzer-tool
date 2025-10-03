@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Video Deep Analyzer</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    button { background: #111827; color: #fff; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #2563eb; }
+    #output { white-space: pre-wrap; background: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-top: 20px; }
+    #status { margin-top: 10px; color: #6b7280; }
+  </style>
+</head>
+<body>
+  <h1>Upload Video for Deep Script Analysis</h1>
+  <input type="file" id="videoInput" accept="video/*">
+  <button id="uploadBtn">Analyze Video</button>
+
+  <div id="status"></div>
+  <div id="output">Result will appear here...</div>
+
+  <script>
+    // 👇 Backend link (Render)
+    const BACKEND = "https://video-analyzer-24tc.onrender.com";
+
+    document.getElementById("uploadBtn").onclick = async () => {
+      const fileInput = document.getElementById("videoInput");
+      const status = document.getElementById("status");
+      const output = document.getElementById("output");
+
+      if (!fileInput.files.length) {
+        alert("Please select a video file first!");
+        return;
+      }
+
+      const form = new FormData();
+      form.append("file", fileInput.files[0]);
+
+      status.textContent = "⏳ Uploading & analyzing... Please wait";
+      output.textContent = "";
+
+      try {
+        const resp = await fetch(`${BACKEND}/analyze`, {
+          method: "POST",
+          body: form
+        });
+
+        if (!resp.ok) throw new Error("Server error: " + resp.status);
+
+        const data = await resp.json();
+        output.textContent = `📜 SCRIPT:\n\n${data.script}\n\n📌 SEGMENTS:\n${JSON.stringify(data.segments, null, 2)}`;
+        status.textContent = "✅ Done!";
+      } catch (err) {
+        status.textContent = "❌ Error occurred";
+        output.textContent = err.message;
+      }
+    };
+  </script>
+</body>
+</html>
