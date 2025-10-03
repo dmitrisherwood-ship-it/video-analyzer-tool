@@ -22,7 +22,7 @@ class ScriptResult(BaseModel):
 
 def extract_audio(video_path, audio_path):
     subprocess.run([
-        "ffmpeg", "-y", "-i", video_path,
+        "ffmpeg", "-y", "-i", video_path,   # 👈 yahan -y add hua
         "-vn", "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1",
         audio_path
     ], check=True)
